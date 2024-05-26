@@ -59,9 +59,9 @@ public class VacationList extends AppCompatActivity {
         if (item.getItemId() == R.id.mysample) {
             repository = new Repository(getApplication());
 
-            Vacation vacation = new Vacation(0, "cancun", 1000.0);
+            Vacation vacation = new Vacation(0, "Bermuda", "Four season hotel", "04/06/24", "04/26/24", 1000.0);
             repository.insert(vacation);
-            Vacation vacation2 = new Vacation(0, "florida", 500.0);
+            Vacation vacation2 = new Vacation(0, "London", "Hilton hotel", "06/16/24", "06/26/24", 2000.0);
             repository.insert(vacation2);
 
             Excursion excursion = new Excursion(0, "high tea", 50, 1);
