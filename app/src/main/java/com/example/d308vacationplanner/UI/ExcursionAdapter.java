@@ -15,8 +15,7 @@ import com.example.d308vacationplanner.entities.Excursion;
 
 import java.util.List;
 
-public class ExcursionAdapter {
-
+public class ExcursionAdapter extends RecyclerView.Adapter<ExcursionAdapter.ExcursionViewHolder>{
 
     class ExcursionViewHolder extends RecyclerView.ViewHolder{
         private final TextView excursionItemView;
@@ -25,20 +24,18 @@ public class ExcursionAdapter {
             super(itemView);
             excursionItemView=itemView.findViewById(R.id.textView2);
             excursionItemView2=itemView.findViewById(R.id.textView3);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int position=getAdapterPosition();
-                    final Excursion current = mExcursions.get(position);
-                    Intent intent = new Intent(context, ExcursionDetails.class);
 
-                    intent.putExtra("id", current.getExcursionID());
-                    intent.putExtra("name", current.getExcursionName());
-                    intent.putExtra("price", current.getPrice());
-                    intent.putExtra("prodID",current.getVacationID());
+            itemView.setOnClickListener(view -> {
+                int position=getAdapterPosition();
+                final Excursion current = mExcursions.get(position);
+                Intent intent = new Intent(context, ExcursionDetails.class);
 
-                    context.startActivity(intent);
-                }
+                intent.putExtra("id", current.getExcursionID());
+                intent.putExtra("name", current.getExcursionName());
+                intent.putExtra("price", current.getPrice());
+                intent.putExtra("prodID",current.getVacationID());
+
+                context.startActivity(intent);
             });
         }
     }

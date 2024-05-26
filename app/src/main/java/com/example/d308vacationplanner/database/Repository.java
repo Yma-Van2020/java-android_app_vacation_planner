@@ -26,6 +26,8 @@ public class Repository {
         mExcursionDAO=db.excursionDAO();
         mVacationDAO=db.vacationDAO();
     }
+
+    // vacations
     public List<Vacation>getAllVacations(){
         databaseExecutor.execute(()->{
             mAllVacations=mVacationDAO.getAllVacations();
@@ -68,6 +70,8 @@ public class Repository {
             e.printStackTrace();
         }
     }
+
+    // excursions --------------------------------------------------------------------
     public List<Excursion>getAllExcursions(){
         databaseExecutor.execute(()->{
             mAllExcursions=mExcursionDAO.getAllExcursions();
