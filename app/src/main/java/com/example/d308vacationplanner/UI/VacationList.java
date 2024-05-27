@@ -2,6 +2,7 @@ package com.example.d308vacationplanner.UI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -32,14 +33,20 @@ public class VacationList extends AppCompatActivity {
         });
 
         repository = new Repository(getApplication());
-
-        List<Vacation> allVacations = repository.getAllVacations();
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-
-        final VacationAdapter vacationAdapter = new VacationAdapter(this);
-
-        recyclerView.setAdapter(vacationAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        refreshVacations(recyclerView);
+    }
+
+    private void refreshVacations(RecyclerView recyclerView) {
+        List<Vacation> allVacations = repository.getAllVacations();
+        Log.d("VacationList", "All Vacations: " + allVacations.size());
+        for (Vacation vacation : allVacations) {
+            Log.d("VacationList", "Vacation: " + vacation.getVacationName());
+        }
+        VacationAdapter vacationAdapter = new VacationAdapter(this);
+        recyclerView.setAdapter(vacationAdapter);
         vacationAdapter.setVacations(allVacations);
     }
 
@@ -67,22 +74,15 @@ public class VacationList extends AppCompatActivity {
             Excursion excursion = new Excursion(0, "high tea", 50, 1);
             repository.insert(excursion);
 
+            refreshVacations(findViewById(R.id.recyclerview));
             return true;
         }
         return true;
     }
+
     @Override
     protected void onResume() {
-
         super.onResume();
-        List<Vacation> allVacations = repository.getAllVacations();
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        final VacationAdapter vacationAdapter = new VacationAdapter(this);
-        recyclerView.setAdapter(vacationAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        vacationAdapter.setVacations(allVacations);
-
-        //Toast.makeText(VacationDetails.this,"refresh list",Toast.LENGTH_LONG).show();
+        refreshVacations(findViewById(R.id.recyclerview));
     }
-
 }

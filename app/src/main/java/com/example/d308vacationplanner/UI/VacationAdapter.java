@@ -2,7 +2,6 @@ package com.example.d308vacationplanner.UI;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,11 +29,14 @@ public class VacationAdapter extends RecyclerView.Adapter<VacationAdapter.Vacati
             itemView.setOnClickListener(view -> {
                 int position = getAdapterPosition();
                 final Vacation current = mVacations.get(position);
-                Intent intent = new Intent(context,VacationDetails.class);
+                Intent intent = new Intent(context, VacationDetails.class);
 
                 intent.putExtra("id", current.getVacationID());
                 intent.putExtra("name", current.getVacationName());
                 intent.putExtra("price", current.getPrice());
+                intent.putExtra("hotel", current.getHotel());
+                intent.putExtra("start", current.getStartDate());
+                intent.putExtra("end", current.getEndDate());
 
                 context.startActivity(intent);
             });
@@ -45,10 +47,11 @@ public class VacationAdapter extends RecyclerView.Adapter<VacationAdapter.Vacati
         mInflater = LayoutInflater.from(context);
         this.context = context;
     }
+
     @NonNull
     @Override
     public VacationAdapter.VacationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = mInflater.inflate(R.layout.vacation_list_item,parent,false);
+        View itemView = mInflater.inflate(R.layout.vacation_list_item, parent, false);
         return new VacationViewHolder(itemView);
     }
 
