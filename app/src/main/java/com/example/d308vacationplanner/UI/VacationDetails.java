@@ -122,30 +122,52 @@ public class VacationDetails extends AppCompatActivity {
             return true;
         }
 
-        
-        if(item.getItemId()== R.id.vacationdelete) {
-            for (Vacation vacation : repository.getAllVacations()) {
-                vacationID = getIntent().getIntExtra("id", -1);
 
-                if (vacation.getVacationID() == vacationID) {
-                    currentVacation = vacation;
+        if (item.getItemId() == R.id.vacationdelete) {
+            // Check if the vacation ID is valid
+            if (vacationID != -1) {
+                // Find the current vacation
+                for (Vacation vacation : repository.getAllVacations()) {
+                    if (vacation.getVacationID() == vacationID) {
+                        currentVacation = vacation;
+                        break; // Break the loop once the vacation is found
+                    }
                 }
 
-                numExcursions = 0;
-                for (Excursion excursion : repository.getAllExcursions()) {
-                    if (excursion.getVacationID() == vacationID) ++numExcursions;
-                }
+                if (currentVacation != null) {
+                    // Check if there are any excursions associated with the vacation
+                    numExcursions = repository.getAllExcursions().stream()
+                            .filter(excursion -> excursion.getVacationID() == vacationID)
+                            .collect(Collectors.toList())
+                            .size();
 
-                if (numExcursions == 0) {
-                    repository.delete(currentVacation);
-                    Toast.makeText(VacationDetails.this, currentVacation.getVacationName() + " was deleted", Toast.LENGTH_LONG).show();
+                    if (numExcursions == 0) {
+                        // If there are no excursions, delete the vacation
+                        try {
+                            repository.delete(currentVacation);
+                            Toast.makeText(VacationDetails.this, currentVacation.getVacationName() + " was deleted", Toast.LENGTH_LONG).show();
+                            finish(); // Finish the activity after successful deletion
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("VacationDetails", "Error deleting vacation", e);
+                            Toast.makeText(VacationDetails.this, "Error deleting vacation", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        // If there are excursions associated with the vacation, display a message
+                        Toast.makeText(VacationDetails.this, "Can't delete a vacation with excursions", Toast.LENGTH_LONG).show();
+                    }
                 } else {
-                    Toast.makeText(VacationDetails.this, "Can't delete a vacation with excursions", Toast.LENGTH_LONG).show();
+                    // If the current vacation is not found, display an error message
+                    Toast.makeText(VacationDetails.this, "Error: Vacation not found", Toast.LENGTH_LONG).show();
                 }
-                return true;
-
+            } else {
+                // If the vacation ID is invalid, display an error message
+                Toast.makeText(VacationDetails.this, "Error: Invalid vacation ID", Toast.LENGTH_LONG).show();
             }
+            return true;
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 
