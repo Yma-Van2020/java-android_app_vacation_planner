@@ -114,10 +114,26 @@ public class VacationDetails extends AppCompatActivity {
             return false;
         }
 
+        // Check if end date is after start date
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        sdf.setLenient(false); // Strict validation
+        try {
+            Date startDate = sdf.parse(editVacationStart.getText().toString());
+            Date endDate = sdf.parse(editVacationEnd.getText().toString());
+            if (endDate.before(startDate)) {
+                // End date is before start date
+                editVacationEnd.setError("End date must be after start date");
+                return false;
+            }
+        } catch (ParseException e) {
+            // Date parsing failed
+            e.printStackTrace();
+            return false;
+        }
+
         // All validation passed
         return true;
     }
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_vacationdetails, menu);
