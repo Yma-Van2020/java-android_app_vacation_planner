@@ -11,7 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import com.example.d308vacationplanner.R;
 import com.example.d308vacationplanner.database.Repository;
 import com.example.d308vacationplanner.entities.Excursion;
@@ -84,6 +86,39 @@ public class VacationDetails extends AppCompatActivity {
         excursionAdapter.setExcursions(excursionsForVacation);
     }
 
+    private boolean isValidDate(String date) {
+        // Define the date format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        sdf.setLenient(false); // Strict validation
+
+        try {
+            // Parse the date string
+            Date parsedDate = sdf.parse(date);
+            return parsedDate != null;
+        } catch (ParseException e) {
+            // Date parsing failed
+            return false;
+        }
+    }
+
+    private boolean validateVacationDetails() {
+        // Validate start date
+        if (!isValidDate(editVacationStart.getText().toString())) {
+            editVacationStart.setError("Invalid date format (MM/DD/YY)");
+            return false;
+        }
+
+        // Validate end date
+        if (!isValidDate(editVacationEnd.getText().toString())) {
+            editVacationEnd.setError("Invalid date format (MM/DD/YY)");
+            return false;
+        }
+
+        // All validation passed
+        return true;
+    }
+
+
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_vacationdetails, menu);
         return true;
@@ -96,6 +131,12 @@ public class VacationDetails extends AppCompatActivity {
             return true;}
 
         if(item.getItemId()== R.id.vacationsave){
+            // Validate vacation details before saving
+            if (!validateVacationDetails()) {
+                // Validation failed, return without saving
+                return true;
+            }
+
             Vacation vacation;
             if (vacationID == -1) {
                 if (repository.getAllVacations().isEmpty()) vacationID = 1;
