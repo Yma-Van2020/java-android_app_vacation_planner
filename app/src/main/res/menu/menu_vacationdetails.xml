@@ -8,4 +8,8 @@
 
     <item android:title="Notify"
         android:id="@+id/vacationnotify"/>
+
+    <item
+        android:id="@+id/shareemail"
+        android:title="Share via Email" />
 </menu>

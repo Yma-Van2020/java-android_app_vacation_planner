@@ -220,6 +220,21 @@ public class VacationDetails extends AppCompatActivity {
         editVacationStart.setText(sdf.format(myCalendarStart.getTime()));
     }
 
+    private void shareViaEmail() {
+        String subject = "Vacation Details";
+        String body = "Vacation Title: " + editTitle.getText().toString() + "\n" +
+                "Hotel: " + editHotel.getText().toString() + "\n" +
+                "Price: $" + editPrice.getText().toString() + "\n" +
+                "Start Date: " + editVacationStart.getText().toString() + "\n" +
+                "End Date: " + editVacationEnd.getText().toString();
+
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("plain/text");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+        startActivity(Intent.createChooser(emailIntent, "Send Email"));
+    }
+
     private void updateLabelEnd() {
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
@@ -307,6 +322,11 @@ public class VacationDetails extends AppCompatActivity {
                     Log.e("VacationDetails", "Error updating vacation", e);
                 }
             }
+            return true;
+        }
+
+        if (item.getItemId() == R.id.shareemail) {
+            shareViaEmail();
             return true;
         }
 
