@@ -1,10 +1,16 @@
 package com.example.d308vacationplanner.UI;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -13,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import com.example.d308vacationplanner.R;
 import com.example.d308vacationplanner.database.Repository;
@@ -21,6 +28,7 @@ import com.example.d308vacationplanner.entities.Vacation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class VacationDetails extends AppCompatActivity {
@@ -38,6 +46,11 @@ public class VacationDetails extends AppCompatActivity {
     double price;
     String vacationStart;
     String vacationEnd;
+    DatePickerDialog.OnDateSetListener startDate;
+    final Calendar myCalendarStart = Calendar.getInstance();
+    DatePickerDialog.OnDateSetListener endDate;
+    final Calendar myCalendarEnd = Calendar.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +76,71 @@ public class VacationDetails extends AppCompatActivity {
         editPrice.setText(Double.toString(price));
         editVacationStart.setText(vacationStart);
         editVacationEnd.setText(vacationEnd);
+
+        String myFormat = "MM/dd/yy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        startDate = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                myCalendarStart.set(Calendar.YEAR, year);
+                myCalendarStart.set(Calendar.MONTH, monthOfYear);
+                myCalendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                updateLabelStart();
+            }
+        };
+
+
+        endDate = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                myCalendarEnd.set(Calendar.YEAR, year);
+                myCalendarEnd.set(Calendar.MONTH, monthOfYear);
+                myCalendarEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                updateLabelEnd();
+        }
+    };
+        editVacationStart.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Date date;
+                //get value from other screen,but I'm going to hard code it right now
+                String info = editVacationStart.getText().toString();
+                if(info.equals(""))info = "05/01/24";
+                try{
+                    myCalendarStart.setTime(sdf.parse(info));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                new DatePickerDialog(VacationDetails.this, startDate, myCalendarStart
+                        .get(Calendar.YEAR), myCalendarStart.get(Calendar.MONTH),
+                        myCalendarStart.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        editVacationEnd.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Date date;
+                //get value from other screen,but I'm going to hard code it right now
+                String info = editVacationEnd.getText().toString();
+                if(info.equals(""))info = "05/03/24";
+                try{
+                    myCalendarEnd.setTime(sdf.parse(info));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                new DatePickerDialog(VacationDetails.this, endDate, myCalendarEnd
+                        .get(Calendar.YEAR), myCalendarEnd.get(Calendar.MONTH),
+                        myCalendarEnd.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
 
         vacationID = getIntent().getIntExtra("id", -1);
 
@@ -135,6 +213,59 @@ public class VacationDetails extends AppCompatActivity {
         return true;
     }
 
+    private void updateLabelStart() {
+        String myFormat = "MM/dd/yy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        editVacationStart.setText(sdf.format(myCalendarStart.getTime()));
+    }
+
+    private void updateLabelEnd() {
+        String myFormat = "MM/dd/yy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        editVacationEnd.setText(sdf.format(myCalendarEnd.getTime()));
+    }
+
+    private void setNotificationForDate(String dateString, String notificationMessage) {
+        String myFormat = "MM/dd/yy"; // The date format you need
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        Calendar todayCalendar = Calendar.getInstance();
+        todayCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        todayCalendar.set(Calendar.MINUTE, 0);
+        todayCalendar.set(Calendar.SECOND, 0);
+
+        Date date = null;
+        try {
+            date = sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (date != null) {
+            Calendar targetCalendar = Calendar.getInstance();
+            targetCalendar.setTime(date);
+            targetCalendar.set(Calendar.HOUR_OF_DAY, 8);
+            targetCalendar.set(Calendar.MINUTE, 0);
+            targetCalendar.set(Calendar.SECOND, 0);
+
+            // Check if the target date is today's date
+            if (targetCalendar.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) &&
+                    targetCalendar.get(Calendar.DAY_OF_YEAR) == todayCalendar.get(Calendar.DAY_OF_YEAR)) {
+                // Set notification only if it's today's date
+                Long trigger = targetCalendar.getTimeInMillis();
+                Intent intent = new Intent(VacationDetails.this, MyReceiver.class);
+                intent.putExtra("key", notificationMessage);
+                PendingIntent sender = PendingIntent.getBroadcast(VacationDetails.this, ++MainActivity.numAlert, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+                Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Log.e("VacationDetails", "Failed to parse date.");
+        }
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_vacationdetails, menu);
         return true;
@@ -178,7 +309,6 @@ public class VacationDetails extends AppCompatActivity {
             }
             return true;
         }
-
 
         if (item.getItemId() == R.id.vacationdelete) {
             // Check if the vacation ID is valid
@@ -224,6 +354,11 @@ public class VacationDetails extends AppCompatActivity {
             return true;
         }
 
+        if (item.getItemId() == R.id.vacationnotify) {
+            setNotificationForDate(editVacationStart.getText().toString(), title + " is starting today!");
+            setNotificationForDate(editVacationEnd.getText().toString(), title + " is ending today!");
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
