@@ -410,6 +410,12 @@ public class VacationDetails extends AppCompatActivity {
             return true;
         }
 
+        if (item.getItemId() == R.id.addexcursion) {
+            Intent intent = new Intent(VacationDetails.this, ExcursionDetails.class);
+            intent.putExtra("vacationID", vacationID);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

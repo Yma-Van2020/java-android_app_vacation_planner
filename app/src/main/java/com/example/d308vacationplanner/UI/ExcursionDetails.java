@@ -21,9 +21,9 @@ public class ExcursionDetails extends AppCompatActivity {
     private EditText excursionDateEditText;
     private Button saveButton;
     private Button deleteButton;
-
     private Repository repository;
     private Excursion currentExcursion;
+    private int excursionID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,26 +39,16 @@ public class ExcursionDetails extends AppCompatActivity {
         saveButton = findViewById(R.id.save_button);
         deleteButton = findViewById(R.id.delete_button);
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveOrUpdateExcursion();
-            }
-        });
+        saveButton.setOnClickListener(v -> saveOrUpdateExcursion());
 
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteExcursion();
-            }
-        });
+        deleteButton.setOnClickListener(v -> deleteExcursion());
 
         // Retrieve excursion data from intent
         String excursionName = getIntent().getStringExtra("name");
         double excursionPrice = getIntent().getDoubleExtra("price", 0.0);
         int excursionVacationId = getIntent().getIntExtra("vacationID", 0);
         String excursionDate = getIntent().getStringExtra("excursionDate");
-        int excursionID = getIntent().getIntExtra("id", 0);
+        excursionID = getIntent().getIntExtra("id", -1);
 
         // Populate EditText fields with excursion data
         excursionNameEditText.setText(excursionName);
@@ -75,7 +65,7 @@ public class ExcursionDetails extends AppCompatActivity {
         int vacationID = Integer.parseInt(excursionVacationIdEditText.getText().toString());
         String date = excursionDateEditText.getText().toString();
 
-        if (currentExcursion != null) {
+        if (excursionID != -1) {
             // Update existing excursion
             currentExcursion.setExcursionName(name);
             currentExcursion.setPrice(price);
@@ -88,6 +78,7 @@ public class ExcursionDetails extends AppCompatActivity {
             // Add new excursion
             Excursion excursion = new Excursion(0, name, price, vacationID, date);
             repository.insert(excursion);
+
             Toast.makeText(this, "Excursion added", Toast.LENGTH_SHORT).show();
         }
         finish(); // Finish the activity after saving or updating

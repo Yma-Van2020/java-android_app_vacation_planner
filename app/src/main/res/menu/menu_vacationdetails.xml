@@ -12,4 +12,8 @@
     <item
         android:id="@+id/shareemail"
         android:title="Share via Email" />
+
+    <item
+        android:id="@+id/addexcursion"
+        android:title="Add Excursion" />
 </menu>
