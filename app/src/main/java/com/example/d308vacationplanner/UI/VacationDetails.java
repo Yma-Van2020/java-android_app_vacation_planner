@@ -235,6 +235,36 @@ public class VacationDetails extends AppCompatActivity {
         startActivity(Intent.createChooser(emailIntent, "Send Email"));
     }
 
+    private void refreshExcursions(RecyclerView recyclerView) {
+        // Retrieve all excursions from the repository
+        List<Excursion> allExcursions = repository.getAllExcursions();
+
+        // Log the number of excursions retrieved
+        Log.d("ExcursionList", "All Excursions: " + allExcursions.size());
+
+        // Log the details of each excursion (optional)
+        for (Excursion excursion : allExcursions) {
+            Log.d("ExcursionList", "Excursion: " + excursion.getExcursionName());
+        }
+
+        // Create an adapter for the RecyclerView
+        ExcursionAdapter excursionAdapter = new ExcursionAdapter(this);
+
+        // Set the adapter on the RecyclerView
+        recyclerView.setAdapter(excursionAdapter);
+
+        // Set the list of excursions on the adapter
+        excursionAdapter.setExcursions(allExcursions);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Call the refreshExcursions method to update the list of excursions
+        refreshExcursions(findViewById(R.id.excursionrecyclerview));
+    }
+
+
     private void updateLabelEnd() {
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);

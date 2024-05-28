@@ -53,22 +53,20 @@ public class ExcursionDetails extends AppCompatActivity {
             }
         });
 
-        if (getIntent().hasExtra("excursionID")) {
-            // Retrieve excursion data from intent
-            String excursionName = getIntent().getStringExtra("name");
-            double excursionPrice = getIntent().getDoubleExtra("price", 0.0);
-            int excursionVacationId = getIntent().getIntExtra("vacationID", 0);
-            String excursionDate = getIntent().getStringExtra("excursionDate");
-            int excursionID = getIntent().getIntExtra("id", 0);
+        // Retrieve excursion data from intent
+        String excursionName = getIntent().getStringExtra("name");
+        double excursionPrice = getIntent().getDoubleExtra("price", 0.0);
+        int excursionVacationId = getIntent().getIntExtra("vacationID", 0);
+        String excursionDate = getIntent().getStringExtra("excursionDate");
+        int excursionID = getIntent().getIntExtra("id", 0);
 
-            // Populate EditText fields with excursion data
-            excursionNameEditText.setText(excursionName);
-            excursionPriceEditText.setText(String.valueOf(excursionPrice));
-            excursionVacationIdEditText.setText(String.valueOf(excursionVacationId));
-            excursionDateEditText.setText(excursionDate);
+        // Populate EditText fields with excursion data
+        excursionNameEditText.setText(excursionName);
+        excursionPriceEditText.setText(String.valueOf(excursionPrice));
+        excursionVacationIdEditText.setText(String.valueOf(excursionVacationId));
+        excursionDateEditText.setText(excursionDate);
 
-            currentExcursion = new Excursion(excursionID, excursionName, excursionPrice, excursionVacationId, excursionDate);
-        }
+        currentExcursion = new Excursion(excursionID, excursionName, excursionPrice, excursionVacationId, excursionDate);
     }
 
     private void saveOrUpdateExcursion() {
@@ -92,7 +90,6 @@ public class ExcursionDetails extends AppCompatActivity {
             repository.insert(excursion);
             Toast.makeText(this, "Excursion added", Toast.LENGTH_SHORT).show();
         }
-
         finish(); // Finish the activity after saving or updating
     }
 
