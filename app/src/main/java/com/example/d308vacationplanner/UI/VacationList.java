@@ -71,7 +71,7 @@ public class VacationList extends AppCompatActivity {
             Vacation vacation2 = new Vacation(0, "London", "Hilton hotel", "06/16/24", "06/26/24", 2000.0);
             repository.insert(vacation2);
 
-            Excursion excursion = new Excursion(0, "high tea", 50, 1);
+            Excursion excursion = new Excursion(0, "high tea", 50, 1, "06/16/24");
             repository.insert(excursion);
 
             refreshVacations(findViewById(R.id.recyclerview));
