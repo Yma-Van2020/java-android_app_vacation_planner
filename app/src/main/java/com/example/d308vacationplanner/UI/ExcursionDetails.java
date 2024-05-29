@@ -81,24 +81,43 @@ public class ExcursionDetails extends AppCompatActivity {
         int vacationID = Integer.parseInt(excursionVacationIdEditText.getText().toString());
         String date = excursionDateEditText.getText().toString();
 
-        if (excursionID != -1) {
-            // Update existing excursion
-            currentExcursion.setExcursionName(name);
-            currentExcursion.setPrice(price);
-            currentExcursion.setVacationID(vacationID);
-            currentExcursion.setExcursionDate(date);
+        // Retrieve the start and end dates of the associated vacation
+        String vacationStartDate = repository.getVacationStartDate(vacationID);
+        String vacationEndDate = repository.getVacationEndDate(vacationID);
 
-            repository.update(currentExcursion);
-            Toast.makeText(this, "Excursion updated", Toast.LENGTH_SHORT).show();
-        } else {
-            // Add new excursion
-            Excursion excursion = new Excursion(0, name, price, vacationID, date);
-            repository.insert(excursion);
+        try {
+            // Parse the excursion date
+            Date excursionDate = sdf.parse(date);
 
-            Toast.makeText(this, "Excursion added", Toast.LENGTH_SHORT).show();
+            // Check if the excursion date is within the vacation range
+            if (excursionDate.before(sdf.parse(vacationStartDate)) || excursionDate.after(sdf.parse(vacationEndDate))) {
+                Toast.makeText(this, "Excursion date must be within the associated vacation's range", Toast.LENGTH_SHORT).show();
+                return; // Exit method if excursion date is not within the vacation range
+            }
+
+            if (excursionID != -1) {
+                // Update existing excursion
+                currentExcursion.setExcursionName(name);
+                currentExcursion.setPrice(price);
+                currentExcursion.setVacationID(vacationID);
+                currentExcursion.setExcursionDate(date);
+
+                repository.update(currentExcursion);
+                Toast.makeText(this, "Excursion updated", Toast.LENGTH_SHORT).show();
+            } else {
+                // Add new excursion
+                Excursion excursion = new Excursion(0, name, price, vacationID, date);
+                repository.insert(excursion);
+
+                Toast.makeText(this, "Excursion added", Toast.LENGTH_SHORT).show();
+            }
+            finish(); // Finish the activity after saving or updating
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error parsing excursion date", Toast.LENGTH_SHORT).show();
         }
-        finish(); // Finish the activity after saving or updating
     }
+
 
 
     private void deleteExcursion() {

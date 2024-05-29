@@ -9,6 +9,7 @@ import androidx.room.Update;
 
 import com.example.d308vacationplanner.entities.Vacation;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -27,4 +28,10 @@ public interface VacationDAO {
 
     @Query("SELECT COUNT(*) FROM excursions WHERE vacationID = :vacationID")
     int getExcursionCountForVacation(int vacationID);
+
+    @Query("SELECT startDate FROM vacations WHERE vacationID = :vacationID")
+    String getStartDateById(int vacationID);
+
+    @Query("SELECT endDate FROM vacations WHERE vacationID = :vacationID")
+    String getEndDateById(int vacationID);
 }

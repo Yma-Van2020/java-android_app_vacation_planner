@@ -27,6 +27,44 @@ public class Repository {
         mVacationDAO=db.vacationDAO();
     }
 
+    // Method to get start date of the vacation by ID
+    public String getVacationStartDate(int vacationID) {
+        final String[] startDate = new String[1]; // Array to hold the start date
+
+        // Execute the query in a background thread
+        databaseExecutor.execute(() -> {
+            startDate[0] = mVacationDAO.getStartDateById(vacationID); // Assuming getStartDateById exists in your VacationDAO
+        });
+
+        // Wait for the query to finish
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return startDate[0]; // Return the start date
+    }
+
+    // Method to get end date of the vacation by ID
+    public String getVacationEndDate(int vacationID) {
+        final String[] endDate = new String[1]; // Array to hold the end date
+
+        // Execute the query in a background thread
+        databaseExecutor.execute(() -> {
+            endDate[0] = mVacationDAO.getEndDateById(vacationID); // Assuming getEndDateById exists in your VacationDAO
+        });
+
+        // Wait for the query to finish
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return endDate[0]; // Return the end date
+    }
+
     // vacations
     public List<Vacation>getAllVacations(){
         databaseExecutor.execute(()->{
