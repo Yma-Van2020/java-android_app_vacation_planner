@@ -1,6 +1,11 @@
 package com.example.d308vacationplanner.UI;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +18,12 @@ import com.example.d308vacationplanner.R;
 import com.example.d308vacationplanner.database.Repository;
 import com.example.d308vacationplanner.entities.Excursion;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class ExcursionDetails extends AppCompatActivity {
 
     private EditText excursionNameEditText;
@@ -21,9 +32,13 @@ public class ExcursionDetails extends AppCompatActivity {
     private EditText excursionDateEditText;
     private Button saveButton;
     private Button deleteButton;
+    private Button notifyButton;
     private Repository repository;
     private Excursion currentExcursion;
     private int excursionID;
+
+    String myFormat = "MM/dd/yy"; //In which you need put here
+    SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +53,10 @@ public class ExcursionDetails extends AppCompatActivity {
         excursionDateEditText = findViewById(R.id.excursion_date);
         saveButton = findViewById(R.id.save_button);
         deleteButton = findViewById(R.id.delete_button);
+        notifyButton = findViewById(R.id.notify_button);
 
         saveButton.setOnClickListener(v -> saveOrUpdateExcursion());
-
+        notifyButton.setOnClickListener(v -> notifyExcursion());
         deleteButton.setOnClickListener(v -> deleteExcursion());
 
         // Retrieve excursion data from intent
@@ -84,6 +100,7 @@ public class ExcursionDetails extends AppCompatActivity {
         finish(); // Finish the activity after saving or updating
     }
 
+
     private void deleteExcursion() {
         if (currentExcursion != null) {
             repository.delete(currentExcursion);
@@ -102,5 +119,62 @@ public class ExcursionDetails extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void notifyExcursion() {
+        String excursionDateStr = excursionDateEditText.getText().toString();
+
+        // Validate date format
+        if (!isValidDate(excursionDateStr)) {
+            Toast.makeText(this, "Invalid date format (MM/DD/YY)", Toast.LENGTH_SHORT).show();
+            return; // Exit method if date format is invalid
+        }
+
+        try {
+            // Parse the excursion date
+            Date excursionDate = sdf.parse(excursionDateStr);
+
+            // Get calendar instance and set it to the excursion date
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(excursionDate);
+
+            // Set notification for the excursion date
+            setNotificationForDate(calendar, currentExcursion.getExcursionName() + " is today!");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error parsing excursion date", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isValidDate(String date) {
+        // Define the date format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        sdf.setLenient(false); // Strict validation
+
+        try {
+            // Parse the date string
+            Date parsedDate = sdf.parse(date);
+            return parsedDate != null;
+        } catch (ParseException e) {
+            // Date parsing failed
+            return false;
+        }
+    }
+
+    private void setNotificationForDate(Calendar targetCalendar, String notificationMessage) {
+        // Create an intent for the broadcast receiver
+        Intent intent = new Intent(this, MyReceiver.class);
+        intent.putExtra("key", notificationMessage);
+
+        // Create a pending intent to be triggered
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, ++MainActivity.numAlert, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        // Get the alarm manager
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        // Set the notification
+        alarmManager.set(AlarmManager.RTC_WAKEUP, targetCalendar.getTimeInMillis(), pendingIntent);
+
+        Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
     }
 }

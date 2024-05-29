@@ -299,11 +299,17 @@ public class VacationDetails extends AppCompatActivity {
                     targetCalendar.get(Calendar.DAY_OF_YEAR) == todayCalendar.get(Calendar.DAY_OF_YEAR)) {
                 // Set notification only if it's today's date
                 Long trigger = targetCalendar.getTimeInMillis();
+
                 Intent intent = new Intent(VacationDetails.this, MyReceiver.class);
+
                 intent.putExtra("key", notificationMessage);
+
                 PendingIntent sender = PendingIntent.getBroadcast(VacationDetails.this, ++MainActivity.numAlert, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
                 alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+
                 Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
             }
         } else {
