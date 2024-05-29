@@ -65,7 +65,7 @@ public class ExcursionAdapter extends RecyclerView.Adapter<ExcursionAdapter.Excu
         }
         else{
             holder.excursionItemView.setText("No excursion name");
-            holder.excursionItemView.setText("No product id");
+            holder.excursionItemView2.setText("No product id");
         }
     }
 

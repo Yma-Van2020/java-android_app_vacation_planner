@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import com.example.d308vacationplanner.R;
@@ -158,9 +159,10 @@ public class VacationDetails extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Filter excursions by vacationID
-        List<Excursion> excursionsForVacation = repository.getAllExcursions().stream()
-                .filter(excursion -> excursion.getVacationID() == vacationID)
-                .collect(Collectors.toList());
+        List<Excursion> excursionsForVacation = new ArrayList<>();
+        for (Excursion p : repository.getAllExcursions()) {
+            if (p.getVacationID() == vacationID) excursionsForVacation.add(p);
+        }
         excursionAdapter.setExcursions(excursionsForVacation);
     }
 
@@ -235,35 +237,27 @@ public class VacationDetails extends AppCompatActivity {
         startActivity(Intent.createChooser(emailIntent, "Send Email"));
     }
 
-    private void refreshExcursions(RecyclerView recyclerView) {
-        // Retrieve all excursions from the repository
-        List<Excursion> allExcursions = repository.getAllExcursions();
+    private void refreshExcursions() {
+        super.onResume();
+        RecyclerView recyclerView = findViewById(R.id.excursionrecyclerview);
 
-        // Log the number of excursions retrieved
-        Log.d("ExcursionList", "All Excursions: " + allExcursions.size());
-
-        // Log the details of each excursion (optional)
-        for (Excursion excursion : allExcursions) {
-            Log.d("ExcursionList", "Excursion: " + excursion.getExcursionName());
-        }
-
-        // Create an adapter for the RecyclerView
-        ExcursionAdapter excursionAdapter = new ExcursionAdapter(this);
-
-        // Set the adapter on the RecyclerView
+        final ExcursionAdapter excursionAdapter = new ExcursionAdapter(this);
         recyclerView.setAdapter(excursionAdapter);
-
-        // Set the list of excursions on the adapter
-        excursionAdapter.setExcursions(allExcursions);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        List<Excursion> filteredExcursions = new ArrayList<>();
+        for (Excursion p : repository.getAllExcursions()) {
+            if (p.getVacationID() == vacationID) filteredExcursions.add(p);
+        }
+        excursionAdapter.setExcursions(filteredExcursions);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Call the refreshExcursions method to update the list of excursions
-        refreshExcursions(findViewById(R.id.excursionrecyclerview));
-    }
+        refreshExcursions();
 
+    }
 
     private void updateLabelEnd() {
         String myFormat = "MM/dd/yy"; //In which you need put here
@@ -294,6 +288,8 @@ public class VacationDetails extends AppCompatActivity {
             targetCalendar.set(Calendar.MINUTE, 0);
             targetCalendar.set(Calendar.SECOND, 0);
 
+            Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
+
             // Check if the target date is today's date
             if (targetCalendar.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) &&
                     targetCalendar.get(Calendar.DAY_OF_YEAR) == todayCalendar.get(Calendar.DAY_OF_YEAR)) {
@@ -309,8 +305,6 @@ public class VacationDetails extends AppCompatActivity {
                 AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                 alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, sender);
-
-                Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
             }
         } else {
             Log.e("VacationDetails", "Failed to parse date.");
