@@ -1,6 +1,7 @@
 package com.example.d308vacationplanner.UI;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -37,7 +38,10 @@ public class ExcursionDetails extends AppCompatActivity {
     private Excursion currentExcursion;
     private int excursionID;
 
-    String myFormat = "MM/dd/yy"; //In which you need put here
+    private DatePickerDialog.OnDateSetListener date;
+    private final Calendar myCalendar = Calendar.getInstance();
+
+    String myFormat = "MM/dd/yy"; // In which you need put here
     SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
     @Override
@@ -73,6 +77,19 @@ public class ExcursionDetails extends AppCompatActivity {
         excursionDateEditText.setText(excursionDate);
 
         currentExcursion = new Excursion(excursionID, excursionName, excursionPrice, excursionVacationId, excursionDate);
+
+        date = (view, year, monthOfYear, dayOfMonth) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
+        };
+
+        excursionDateEditText.setOnClickListener(v -> {
+            new DatePickerDialog(ExcursionDetails.this, date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
     }
 
     private void saveOrUpdateExcursion() {
@@ -117,8 +134,6 @@ public class ExcursionDetails extends AppCompatActivity {
             excursionDateEditText.setError("Invalid date format (MM/DD/YY)");
         }
     }
-
-
 
     private void deleteExcursion() {
         if (currentExcursion != null) {
@@ -195,5 +210,12 @@ public class ExcursionDetails extends AppCompatActivity {
         alarmManager.set(AlarmManager.RTC_WAKEUP, targetCalendar.getTimeInMillis(), pendingIntent);
 
         Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateLabel() {
+        String myFormat = "MM/dd/yy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        excursionDateEditText.setText(sdf.format(myCalendar.getTime()));
     }
 }
