@@ -77,6 +77,12 @@ public class VacationList extends AppCompatActivity {
             refreshVacations(findViewById(R.id.recyclerview));
             return true;
         }
+
+        if (item.getItemId() == R.id.addvacation) {
+            Intent intent = new Intent(VacationList.this, VacationDetails.class);
+            startActivity(intent);
+            return true;
+        }
         return true;
     }
 

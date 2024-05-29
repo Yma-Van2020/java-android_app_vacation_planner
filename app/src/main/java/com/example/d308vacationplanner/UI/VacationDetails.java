@@ -422,6 +422,7 @@ public class VacationDetails extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
