@@ -114,7 +114,7 @@ public class ExcursionDetails extends AppCompatActivity {
             finish(); // Finish the activity after saving or updating
         } catch (ParseException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Error parsing excursion date", Toast.LENGTH_SHORT).show();
+            excursionDateEditText.setError("Invalid date format (MM/DD/YY)");
         }
     }
 
@@ -145,8 +145,8 @@ public class ExcursionDetails extends AppCompatActivity {
 
         // Validate date format
         if (!isValidDate(excursionDateStr)) {
-            Toast.makeText(this, "Invalid date format (MM/DD/YY)", Toast.LENGTH_SHORT).show();
-            return; // Exit method if date format is invalid
+            excursionDateEditText.setError("Invalid date format (MM/DD/YY)");
+            return;
         }
 
         try {
