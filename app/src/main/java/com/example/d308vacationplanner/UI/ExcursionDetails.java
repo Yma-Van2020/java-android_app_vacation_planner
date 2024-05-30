@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -164,20 +165,7 @@ public class ExcursionDetails extends AppCompatActivity {
             return;
         }
 
-        try {
-            // Parse the excursion date
-            Date excursionDate = sdf.parse(excursionDateStr);
-
-            // Get calendar instance and set it to the excursion date
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(excursionDate);
-
-            // Set notification for the excursion date
-            setNotificationForDate(calendar, currentExcursion.getExcursionName() + " is today!");
-        } catch (ParseException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error parsing excursion date", Toast.LENGTH_SHORT).show();
-        }
+        setNotificationForDate(excursionDateStr, currentExcursion.getExcursionName() + " is today!");
     }
 
     private boolean isValidDate(String date) {
@@ -195,21 +183,49 @@ public class ExcursionDetails extends AppCompatActivity {
         }
     }
 
-    private void setNotificationForDate(Calendar targetCalendar, String notificationMessage) {
-        // Create an intent for the broadcast receiver
-        Intent intent = new Intent(this, MyReceiver.class);
-        intent.putExtra("key", notificationMessage);
+    private void setNotificationForDate(String dateString, String notificationMessage) {
+        String myFormat = "MM/dd/yy"; // The date format you need
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        Calendar todayCalendar = Calendar.getInstance();
+        todayCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        todayCalendar.set(Calendar.MINUTE, 0);
+        todayCalendar.set(Calendar.SECOND, 0);
 
-        // Create a pending intent to be triggered
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, ++MainActivity.numAlert, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Date date = null;
+        try {
+            date = sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-        // Get the alarm manager
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (date != null) {
+            Calendar targetCalendar = Calendar.getInstance();
+            targetCalendar.setTime(date);
+            targetCalendar.set(Calendar.HOUR_OF_DAY, 8);
+            targetCalendar.set(Calendar.MINUTE, 0);
+            targetCalendar.set(Calendar.SECOND, 0);
 
-        // Set the notification
-        alarmManager.set(AlarmManager.RTC_WAKEUP, targetCalendar.getTimeInMillis(), pendingIntent);
+            Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(this, "Notification set for: " + targetCalendar.getTime().toString(), Toast.LENGTH_SHORT).show();
+            // Check if the target date is today's date
+            if (targetCalendar.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) &&
+                    targetCalendar.get(Calendar.DAY_OF_YEAR) == todayCalendar.get(Calendar.DAY_OF_YEAR)) {
+                // Set notification only if it's today's date
+                Long trigger = targetCalendar.getTimeInMillis();
+
+                Intent intent = new Intent(ExcursionDetails.this, MyReceiver.class);
+
+                intent.putExtra("key", notificationMessage);
+
+                PendingIntent sender = PendingIntent.getBroadcast(ExcursionDetails.this, ++MainActivity.numAlert, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+            }
+        } else {
+            Log.e("VacationDetails", "Failed to parse date.");
+        }
     }
 
     private void updateLabel() {

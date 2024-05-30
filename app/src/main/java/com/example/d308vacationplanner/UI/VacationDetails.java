@@ -336,7 +336,7 @@ public class VacationDetails extends AppCompatActivity {
 
                 vacation = new Vacation(vacationID, editTitle.getText().toString(), editHotel.getText().toString(), editVacationStart.getText().toString(), editVacationEnd.getText().toString(), Double.parseDouble(editPrice.getText().toString()));
                 repository.insert(vacation);
-                Toast.makeText(this, "Vacation inserted successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vacation added successfully", Toast.LENGTH_SHORT).show();
                 Log.d("VacationDetails", "Vacation inserted: " + vacationID);
                 this.finish();
             } else {
